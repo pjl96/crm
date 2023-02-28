@@ -1,7 +1,7 @@
 'use strict';
 
 const goods = [
-  {
+{
     "id": 1,
     "title": "Смартфон Xiaomi 11T 8/128GB",
     "price": 27000,
@@ -64,50 +64,55 @@ const modalTitle = document.querySelector('.modal__title');
 const modalForm = document.querySelector('.modal__form');
 const modalCheckbox = document.querySelector('.modal__checkbox');
 const modalDiscountInput = document.querySelector('.modal__input');
-const btnModalClose = document.querySelector('.modal__close');
 const btnAddGood = document.querySelector('.panel__add-goods');
 const overlay = document.querySelector('.overlay');
+const row = document.querySelector('.table__body');
 
 const createRow = obj => {
-    const newRow = document.createElement('tr');
-    newRow.insertAdjacentHTML('afterbegin', `
-      <td class="table__cell">3</td>
-        <td class="table__cell table__cell_left table__cell_name" data-id="${obj.id}">
-          <span class="table__cell-id">id: ${obj.id}</span>
-          ${obj.title}
+      const newRow = document.createElement('tr');
+      newRow.classList.add('good');
+      newRow.insertAdjacentHTML('afterbegin', `
+        <td class="table__cell">3</td>
+          <td class="table__cell table__cell_left table__cell_name"
+           data-id="${obj.id}">
+            <span class="table__cell-id">id: ${obj.id}</span>
+            ${obj.title}
+          </td>
+          <td class="table__cell table__cell_left">${obj.category}</td>
+          <td class="table__cell">${obj.units}</td>
+          <td class="table__cell">${obj.count}</td>
+          <td class="table__cell">$${obj.price}</td>
+          <td class="table__cell">$${obj.price * obj.count}</td>
+          <td class="table__cell table__cell_btn-wrapper">
+            <button class="table__btn table__btn_pic"></button>
+            <button class="table__btn table__btn_edit"></button>
+            <button class="table__btn table__btn_del"></button>
         </td>
-        <td class="table__cell table__cell_left">${obj.category}</td>
-        <td class="table__cell">${obj.units}</td>
-        <td class="table__cell">${obj.count}</td>
-        <td class="table__cell">$${obj.price}</td>
-        <td class="table__cell">$${obj.price * obj.count}</td>
-        <td class="table__cell table__cell_btn-wrapper">
-          <button class="table__btn table__btn_pic"></button>
-          <button class="table__btn table__btn_edit"></button>
-          <button class="table__btn table__btn_del"></button>
-      </td>
-    `);
-    return newRow;
+        `);
+      return newRow;
 };
 
 const renderGoods = arr => {
-    arr.forEach((item) => console.log(createRow(item)));
+    arr.map((item) => row.append(createRow(item)));
 };
 
 btnAddGood.addEventListener('click', () => {
     overlay.classList.add('active');
 });
 
-modal.addEventListener('click', e => {
-    e.stopImmediatePropagation();
+overlay.addEventListener('click', e => {
+    const target = e.target;
+    if (target === overlay ||
+       target.closest('.modal__close')) {
+        overlay.classList.remove('active');
+    }
 });
 
-overlay.addEventListener('click', () => {
-    overlay.classList.remove('active');
-});
-
-btnModalClose.addEventListener('click', () => {
-    overlay.classList.remove('active');
+row.addEventListener('click', e => {
+    const target = e.target;
+    if (target.closest('.table__btn_del')) {
+        target.closest('tr').remove();
+    }
 });
 
 renderGoods(goods);
