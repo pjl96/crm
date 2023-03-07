@@ -78,20 +78,11 @@ const overlay = document.querySelector('.overlay'); // Оверлей
 const row = document.querySelector('.table__body'); // Строки с товарами
 const tr = document.getElementsByTagName('tr'); // Все строки из таблицы
 
-// Функция для определения порядкового номера в таблице товаров
-const orderNumber = e => {
-  let n = 0;
-  for (let i = 0; i < e.length; i++) {
-    n++;
-  }
-  return n;
-};
-
 // Функция для добавления нового товара в верстку
 const createRow = obj => {
   const newRow = document.createElement('tr');
   newRow.insertAdjacentHTML('afterbegin', `
-    <td class="table__cell">${orderNumber(tr)}</td>
+    <td class="table__cell"></td>
       <td class="table__cell table__cell_left table__cell_name"
         data-id="${obj.id}">
         <span class="table__cell-id">id: ${obj.id}</span>
@@ -116,6 +107,16 @@ const renderGoods = arr => {
   arr.map((item) => row.append(createRow(item)));
 };
 
+// Функция для определения порядкового номера в таблице товаров
+const orderNumber = e => {
+  for (let i = 1; i < tr.length; i++) {
+    tr[i].cells[0].innerHTML = i;
+  }
+};
+
+renderGoods(goods); // Генерация верстки
+orderNumber(tr); // Присваивание правильных порядковых номеров
+
 // Вызов модального окна с добавлением товара
 btnAddGood.addEventListener('click', () => {
   overlay.classList.add('active');
@@ -136,7 +137,7 @@ console.log(goods);
 row.addEventListener('click', e => {
   const target = e.target;
   if (target.closest('.table__btn_del')) {
-    target.closest('tr').remove();
+    target.closest('tr').remove(); // Удаление строки, по которой был клик
     // Удаление объекта, по которому был клик, из базы данных
     const delItem = target.closest('tr').querySelector(
       '.table__cell_name').getAttribute('data-id');
@@ -146,7 +147,6 @@ row.addEventListener('click', e => {
         console.log(goods);
       }
     }
+    orderNumber(tr);
   }
 });
-
-renderGoods(goods);
