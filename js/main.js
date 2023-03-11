@@ -66,13 +66,14 @@ const goods = [
 const modal = document.querySelector('.modal'); // Модальное окно
 const modalTitle = document.querySelector(
   '.modal__title'); // Заголовок модального окна
+const venderCode = document.querySelector('.vendor-code__id');
 const modalForm = document.querySelector(
   '.modal__form'); // Форма модального окна
 const modalCheckbox = document.querySelector(
   '.modal__checkbox'); // Чекбокс со скидкой
 const modalDiscountInput = document.querySelector(
-  '.modal__input'); // Окно с суммой скидки
-const btnAddGood = document.querySelector(
+  '.modal__input_discount'); // Окно с суммой скидки
+const btnAddGoods = document.querySelector(
   '.panel__add-goods'); // Кнопка добавления товара
 const overlay = document.querySelector('.overlay'); // Оверлей
 const row = document.querySelector('.table__body'); // Строки с товарами
@@ -117,17 +118,40 @@ const orderNumber = e => {
 renderGoods(goods); // Генерация верстки
 orderNumber(tr); // Присваивание правильных порядковых номеров
 
-// Вызов модального окна с добавлением товара
-btnAddGood.addEventListener('click', () => {
+// Функция вызова модального окна с добавлением товара
+const openModal = () =>{
   overlay.classList.add('active');
+};
+
+// Функция закрытия модального окна по клику на крестик или вне модального окна
+const closeModal = () => {
+  overlay.classList.remove('active');
+};
+
+// Функция подсчета итоговой стоимости на странице
+const totalPrice = tr => {
+  const totalPrice = document.querySelector('.cms__total-price');
+  let total = 0;
+  for (let i = 1; i < tr.length; i++) {
+    total += Number(tr[i].cells[6].textContent.slice(1));
+  }
+  totalPrice.textContent = `$${total}.00`;
+};
+
+totalPrice(tr); // Подсчет стоимости на странице
+
+btnAddGoods.addEventListener('click', () => {
+  openModal();
+  venderCode.innerHTML = Math.floor(Math.random() *
+   (99999999999999 - 10000000000000) + 10000000000000);
+  console.log('venderID: ', venderCode.textContent);
 });
 
-// Закрытие модального окна по клику на крестик или вне модального окна
 overlay.addEventListener('click', e => {
   const target = e.target;
   if (target === overlay ||
-    target.closest('.modal__close')) {
-    overlay.classList.remove('active');
+   target.closest('.modal__close')) {
+    closeModal();
   }
 });
 
@@ -148,5 +172,43 @@ row.addEventListener('click', e => {
       }
     }
     orderNumber(tr);
+    totalPrice(tr);
   }
+});
+
+// Проверка чекбокса на скидку
+modalCheckbox.addEventListener('click', () => {
+  if (modalCheckbox.checked) {
+    modalDiscountInput.removeAttribute('disabled');
+  } else {
+    modalDiscountInput.value = '';
+    modalDiscountInput.setAttribute('disabled', true);
+  }
+});
+
+// Подсчет итоговой стоимости в форме
+modalForm.addEventListener('change', () => {
+  if (modalCheckbox.checked) {
+    modalForm.total.textContent = `$${Math.floor(modalForm.count.value *
+      modalForm.price.value * ((100 - modalForm.discount_count.value) / 100))}`;
+  } else {
+    modalForm.total.value = `$${modalForm.count.value *
+      modalForm.price.value}`;
+  }
+});
+
+// Создание и добавление товара в верстку после нажатия на кнопку
+modalForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const newGoods = [];
+  newGoods.push(Object.fromEntries(formData));
+  newGoods[0].id = venderCode.textContent;
+  goods.push(Object.fromEntries(formData));
+  goods[goods.length - 1].id = venderCode.textContent;
+  renderGoods(newGoods);
+  orderNumber(tr);
+  modalForm.reset();
+  closeModal();
+  totalPrice(tr);
 });
