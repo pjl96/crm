@@ -119,7 +119,7 @@ renderGoods(goods); // Генерация верстки
 orderNumber(tr); // Присваивание правильных порядковых номеров
 
 // Функция вызова модального окна с добавлением товара
-const openModal = () =>{
+const openModal = () => {
   overlay.classList.add('active');
 };
 
@@ -142,6 +142,7 @@ totalPrice(tr); // Подсчет стоимости на странице
 
 btnAddGoods.addEventListener('click', () => {
   openModal();
+  modalDiscountInput.style.border = '1px solid #ffb0b0';
   venderCode.innerHTML = Math.floor(Math.random() *
    (99999999999999 - 10000000000000) + 10000000000000);
   console.log('venderID: ', venderCode.textContent);
@@ -180,9 +181,11 @@ row.addEventListener('click', e => {
 modalCheckbox.addEventListener('click', () => {
   if (modalCheckbox.checked) {
     modalDiscountInput.removeAttribute('disabled');
+    modalDiscountInput.style.border = 'none';
   } else {
     modalDiscountInput.value = '';
     modalDiscountInput.setAttribute('disabled', true);
+    modalDiscountInput.style.border = '1px solid #ffb0b0';
   }
 });
 
